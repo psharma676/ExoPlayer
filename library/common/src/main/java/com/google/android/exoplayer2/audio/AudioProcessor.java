@@ -15,9 +15,12 @@
  */
 package com.google.android.exoplayer2.audio;
 
+import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.util.Util;
+import com.google.common.base.Objects;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -68,6 +71,25 @@ public interface AudioProcessor {
           + encoding
           + ']';
     }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof AudioFormat)) {
+        return false;
+      }
+      AudioFormat that = (AudioFormat) o;
+      return sampleRate == that.sampleRate
+          && channelCount == that.channelCount
+          && encoding == that.encoding;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(sampleRate, channelCount, encoding);
+    }
   }
 
   /** Exception thrown when a processor can't be configured for a given input audio format. */
@@ -96,6 +118,7 @@ public interface AudioProcessor {
    * @return The configured output audio format if this instance is {@link #isActive() active}.
    * @throws UnhandledAudioFormatException Thrown if the specified format can't be handled as input.
    */
+  @CanIgnoreReturnValue
   AudioFormat configure(AudioFormat inputAudioFormat) throws UnhandledAudioFormatException;
 
   /** Returns whether the processor is configured and will process input buffers. */
