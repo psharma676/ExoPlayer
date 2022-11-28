@@ -88,6 +88,7 @@ import com.google.android.exoplayer2.util.HandlerWrapper;
 import com.google.android.exoplayer2.util.ListenerSet;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.PriorityTaskManager;
+import com.google.android.exoplayer2.util.Size;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoDecoderOutputBufferRenderer;
 import com.google.android.exoplayer2.video.VideoFrameMetadataListener;
@@ -181,8 +182,7 @@ import java.util.concurrent.TimeoutException;
   @Nullable private TextureView textureView;
   private @C.VideoScalingMode int videoScalingMode;
   private @C.VideoChangeFrameRateStrategy int videoChangeFrameRateStrategy;
-  private int surfaceWidth;
-  private int surfaceHeight;
+  private Size surfaceSize;
   @Nullable private DecoderCounters videoDecoderCounters;
   @Nullable private DecoderCounters audioDecoderCounters;
   private int audioSessionId;
@@ -334,7 +334,8 @@ import java.util.concurrent.TimeoutException;
               applicationLooper,
               clock,
               playbackInfoUpdateListener,
-              playerId);
+              playerId,
+              builder.playbackLooper);
 
       volume = 1;
       repeatMode = Player.REPEAT_MODE_OFF;
@@ -371,6 +372,7 @@ import java.util.concurrent.TimeoutException;
       wifiLockManager.setEnabled(builder.wakeMode == C.WAKE_MODE_NETWORK);
       deviceInfo = createDeviceInfo(streamVolumeManager);
       videoSize = VideoSize.UNKNOWN;
+      surfaceSize = Size.UNKNOWN;
 
       trackSelector.setAudioAttributes(audioAttributes);
       sendRendererMessage(TRACK_TYPE_AUDIO, MSG_SET_AUDIO_SESSION_ID, audioSessionId);
@@ -1216,6 +1218,12 @@ import java.util.concurrent.TimeoutException;
   public VideoSize getVideoSize() {
     verifyApplicationThread();
     return videoSize;
+  }
+
+  @Override
+  public Size getSurfaceSize() {
+    verifyApplicationThread();
+    return surfaceSize;
   }
 
   @Override
@@ -2534,9 +2542,8 @@ import java.util.concurrent.TimeoutException;
   }
 
   private void maybeNotifySurfaceSizeChanged(int width, int height) {
-    if (width != surfaceWidth || height != surfaceHeight) {
-      surfaceWidth = width;
-      surfaceHeight = height;
+    if (width != surfaceSize.getWidth() || height != surfaceSize.getHeight()) {
+      surfaceSize = new Size(width, height);
       listeners.sendEvent(
           EVENT_SURFACE_SIZE_CHANGED, listener -> listener.onSurfaceSizeChanged(width, height));
     }

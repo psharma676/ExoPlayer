@@ -581,8 +581,6 @@ public final class TransformerEndToEndTest {
             () -> {
               try {
                 transformer.startTransformation(mediaItem, outputPath);
-              } catch (IOException e) {
-                // Do nothing.
               } catch (IllegalStateException e) {
                 illegalStateException.set(e);
               } finally {
@@ -912,13 +910,13 @@ public final class TransformerEndToEndTest {
     }
 
     @Override
-    public Muxer create(String path) throws IOException {
+    public Muxer create(String path) throws Muxer.MuxerException {
       testMuxer = new TestMuxer(path, defaultMuxerFactory);
       return testMuxer;
     }
 
     @Override
-    public Muxer create(ParcelFileDescriptor parcelFileDescriptor) throws IOException {
+    public Muxer create(ParcelFileDescriptor parcelFileDescriptor) throws Muxer.MuxerException {
       testMuxer = new TestMuxer("FD:" + parcelFileDescriptor.getFd(), defaultMuxerFactory);
       return testMuxer;
     }

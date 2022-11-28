@@ -22,9 +22,11 @@ import static com.google.android.exoplayer2.util.Util.SDK_INT;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaFormat;
+import android.util.Pair;
 import android.view.Surface;
 import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.util.MediaFormatUtil;
 import com.google.android.exoplayer2.util.MimeTypes;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
@@ -70,7 +72,7 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
   @SuppressLint("InlinedApi")
   @Override
   public Codec createForVideoDecoding(
-      Format format, Surface outputSurface, boolean enableRequestSdrToneMapping)
+      Format format, Surface outputSurface, boolean requestSdrToneMapping)
       throws TransformationException {
     MediaFormat mediaFormat =
         MediaFormat.createVideoFormat(
@@ -85,9 +87,16 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
       // transformer to decode as many frames as possible in one render cycle.
       mediaFormat.setInteger(MediaFormat.KEY_ALLOW_FRAME_DROP, 0);
     }
-    if (SDK_INT >= 31 && enableRequestSdrToneMapping) {
+    if (SDK_INT >= 31 && requestSdrToneMapping) {
       mediaFormat.setInteger(
           MediaFormat.KEY_COLOR_TRANSFER_REQUEST, MediaFormat.COLOR_TRANSFER_SDR_VIDEO);
+    }
+
+    @Nullable
+    Pair<Integer, Integer> codecProfileAndLevel = MediaCodecUtil.getCodecProfileAndLevel(format);
+    if (codecProfileAndLevel != null) {
+      MediaFormatUtil.maybeSetInteger(
+          mediaFormat, MediaFormat.KEY_PROFILE, codecProfileAndLevel.first);
     }
 
     @Nullable

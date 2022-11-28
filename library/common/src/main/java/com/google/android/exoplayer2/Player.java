@@ -37,6 +37,7 @@ import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.CueGroup;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.util.FlagSet;
+import com.google.android.exoplayer2.util.Size;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoSize;
 import com.google.common.base.Objects;
@@ -673,7 +674,8 @@ public interface Player {
      * to the current {@link #getRepeatMode() repeat mode}.
      *
      * <p>Note that this callback is also called when the playlist becomes non-empty or empty as a
-     * consequence of a playlist change.
+     * consequence of a playlist change or {@linkplain #onAvailableCommandsChanged(Commands) a
+     * change in available commands}.
      *
      * <p>{@link #onEvents(Player, Events)} will also be called to report this event along with
      * other events that happen in the same {@link Looper} message queue iteration.
@@ -2484,6 +2486,13 @@ public interface Player {
    * @see Listener#onVideoSizeChanged(VideoSize)
    */
   VideoSize getVideoSize();
+
+  /**
+   * Gets the size of the surface on which the video is rendered.
+   *
+   * @see Listener#onSurfaceSizeChanged(int, int)
+   */
+  Size getSurfaceSize();
 
   /** Returns the current {@link CueGroup}. */
   CueGroup getCurrentCues();

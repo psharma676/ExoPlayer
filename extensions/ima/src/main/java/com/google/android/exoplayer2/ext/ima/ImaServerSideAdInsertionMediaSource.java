@@ -152,7 +152,7 @@ public final class ImaServerSideAdInsertionMediaSource extends CompositeMediaSou
     }
 
     @Override
-    public int[] getSupportedTypes() {
+    public @C.ContentType int[] getSupportedTypes() {
       return contentMediaSourceFactory.getSupportedTypes();
     }
 
@@ -531,7 +531,7 @@ public final class ImaServerSideAdInsertionMediaSource extends CompositeMediaSou
 
   @Override
   protected void onChildSourceInfoRefreshed(
-      Void id, MediaSource mediaSource, Timeline newTimeline) {
+      Void childSourceId, MediaSource mediaSource, Timeline newTimeline) {
     refreshSourceInfo(
         new ForwardingTimeline(newTimeline) {
           @Override
